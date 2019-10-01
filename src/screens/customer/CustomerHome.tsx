@@ -1,17 +1,20 @@
 import React from 'react';
-import {View} from 'react-native';
-import {Card, ThemeProvider, Header, Text, Button} from 'react-native-elements';
+import { View } from 'react-native';
+import { connect } from 'react-redux';
+import { Card, ThemeProvider, Text, Button } from 'react-native-elements';
 import styled from 'styled-components/native';
 import {
   NavigationParams,
   NavigationScreenProp,
   NavigationState,
 } from 'react-navigation';
-import {appTheme} from '../../styles/appTheme';
+
+import { appTheme } from '../../styles/appTheme';
 import * as colours from '../../styles/colours';
-import {NumberPad} from '../../components/NumberPad';
-import {CustomHeader} from '../../components/CustomHeader';
+import { NumberPad, CustomHeader } from '../../components';
 import t from '../../common/Translator';
+import * as Utils from '../../common/Utils';
+import { approveAmount } from '../../store/actions';
 
 /**
  * Styled Components
@@ -41,6 +44,7 @@ const Message = styled.Text`
  */
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
+  approveAmount: typeof approveAmount;
 }
 
 /**
@@ -48,7 +52,7 @@ interface Props {
  * User may enter the amount to withdraw.
  * Basic validations are performed,
  */
-class CustomerHome extends React.Component<Props> {
+class CustomerHomeComponent extends React.Component<Props> {
   state = {
     withdrawalAmount: '',
     message: '',
@@ -60,11 +64,11 @@ class CustomerHome extends React.Component<Props> {
   onNumbPressed = (numPressed: string) => {
     let currentAmount = this.state.withdrawalAmount;
     if (currentAmount.length < 1 && numPressed == '0') {
-      this.setState({message: t._('You cannot start with 0')});
+      this.setState({ message: t._('You cannot start with 0') });
       return;
     }
     if (currentAmount.length >= 6) {
-      this.setState({message: t._('Maximum withdrawal limit is 999.999')});
+      this.setState({ message: t._('Maximum withdrawal limit is 999.999') });
       return;
     }
 
@@ -81,14 +85,15 @@ class CustomerHome extends React.Component<Props> {
   onBackspacePressed = () => {
     let value = this.state.withdrawalAmount;
     let withdrawalAmount = value.slice(0, value.length - 1);
-    this.setState({withdrawalAmount});
+    this.setState({ withdrawalAmount });
   };
 
   /**
    * Proceed button onPress handler.
    */
   onProceedPressed = () => {
-    if (!this.isValidAmount(parseInt(this.state.withdrawalAmount))) {
+    this.props.approveAmount(parseInt(this.state.withdrawalAmount));
+    /*if (!Utils.isValidAmount(parseInt(this.state.withdrawalAmount))) {
       this.setState({
         message: t._(
           'Smallest possible bank note is 2000. Please change to a valid amount!',
@@ -96,18 +101,7 @@ class CustomerHome extends React.Component<Props> {
       });
     } else {
       this.props.navigation.navigate('CustomerPreview');
-    }
-  };
-
-  /**
-   * Prevalidates give amount. It needs to be higher than 2000, and divisible by 1000.
-   * @param amount User input, amount to withdraw.
-   * @returns True if valid, false otherwise.
-   */
-  isValidAmount = (amount: number): boolean => {
-    if (amount < 2000) return false;
-    if (amount % 1000 != 0 && amount % 1000 < 1000) return false;
-    return true;
+    }*/
   };
 
   /**
@@ -116,7 +110,8 @@ class CustomerHome extends React.Component<Props> {
    */
   renderAmountText = (amount: string) => {
     return (
-      <Text style={{fontSize: 40, fontWeight: 'bold', color: colours.PRIMARY}}>
+      <Text
+        style={{ fontSize: 40, fontWeight: 'bold', color: colours.PRIMARY }}>
         {amount}
       </Text>
     );
@@ -154,4 +149,13 @@ class CustomerHome extends React.Component<Props> {
   }
 }
 
-export {CustomerHome};
+const mapStateToProps = state => {
+  return state;
+};
+
+const CustomerHome = connect(
+  mapStateToProps,
+  { approveAmount },
+)(CustomerHomeComponent);
+
+export { CustomerHome };

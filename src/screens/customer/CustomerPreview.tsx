@@ -1,15 +1,21 @@
 import React from 'react';
-import {View} from 'react-native';
-import {Card, ThemeProvider, Header, Text, Button} from 'react-native-elements';
+import { View } from 'react-native';
+import {
+  Card,
+  ThemeProvider,
+  Header,
+  Text,
+  Button,
+} from 'react-native-elements';
 import styled from 'styled-components/native';
 import {
   NavigationParams,
   NavigationScreenProp,
   NavigationState,
 } from 'react-navigation';
-import {appTheme} from '../../styles/appTheme';
+import { appTheme } from '../../styles/appTheme';
 import * as colours from '../../styles/colours';
-import {CustomHeader} from '../../components/CustomHeader';
+import { CustomHeader } from '../../components/CustomHeader';
 import t from '../../common/Translator';
 
 /**
@@ -59,7 +65,7 @@ class CustomerPreview extends React.Component<Props> {
   onBackspacePressed = () => {
     let value = this.state.withdrawalAmount;
     let withdrawalAmount = value.slice(0, value.length - 1);
-    this.setState({withdrawalAmount});
+    this.setState({ withdrawalAmount });
   };
 
   /**
@@ -94,7 +100,8 @@ class CustomerPreview extends React.Component<Props> {
    */
   renderAmountText = (amount: string) => {
     return (
-      <Text style={{fontSize: 40, fontWeight: 'bold', color: colours.PRIMARY}}>
+      <Text
+        style={{ fontSize: 40, fontWeight: 'bold', color: colours.PRIMARY }}>
         {amount}
       </Text>
     );
@@ -128,4 +135,4 @@ class CustomerPreview extends React.Component<Props> {
   }
 }
 
-export {CustomerPreview};
+export { CustomerPreview };
