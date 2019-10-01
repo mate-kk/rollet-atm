@@ -16,7 +16,7 @@ interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
 }
 
-class OnBoarding extends React.Component<NavigationInjectedProps> {
+class OnBoarding extends React.Component<Props> {
   render() {
     return (
       //@ts-ignore
@@ -24,12 +24,12 @@ class OnBoarding extends React.Component<NavigationInjectedProps> {
         <ContainerView>
           <OnBoardingButton
             title={t._('For Customers')}
-            onPress={() => this.props.navigation.navigate('CustomerHome')}
+            onPress={() => this.props.navigation.navigate('CustomerRoute')}
           />
           <Divider style={{backgroundColor: 'blue'}} />
           <OnBoardingButton
             title={t._('For Operators')}
-            onPress={() => console.log('OPERATORS')}
+            onPress={() => this.props.navigation.navigate('OperatorRoute')}
           />
         </ContainerView>
       </ThemeProvider>

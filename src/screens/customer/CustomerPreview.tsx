@@ -9,7 +9,6 @@ import {
 } from 'react-navigation';
 import {appTheme} from '../../styles/appTheme';
 import * as colours from '../../styles/colours';
-import {NumberPad} from '../../components/NumberPad';
 import {CustomHeader} from '../../components/CustomHeader';
 import t from '../../common/Translator';
 
@@ -48,31 +47,10 @@ interface Props {
  * User may enter the amount to withdraw.
  * Basic validations are performed,
  */
-class CustomerHome extends React.Component<Props> {
+class CustomerPreview extends React.Component<Props> {
   state = {
     withdrawalAmount: '',
     message: '',
-  };
-
-  /**
-   * Numeric button onPress handler.
-   */
-  onNumbPressed = (numPressed: string) => {
-    let currentAmount = this.state.withdrawalAmount;
-    if (currentAmount.length < 1 && numPressed == '0') {
-      this.setState({message: t._('You cannot start with 0')});
-      return;
-    }
-    if (currentAmount.length >= 6) {
-      this.setState({message: t._('Maximum withdrawal limit is 999.999')});
-      return;
-    }
-
-    let withdrawalAmount = `${this.state.withdrawalAmount}${numPressed}`;
-    this.setState({
-      message: '',
-      withdrawalAmount,
-    });
   };
 
   /**
@@ -127,8 +105,8 @@ class CustomerHome extends React.Component<Props> {
       //@ts-ignore
       <ThemeProvider theme={appTheme}>
         <CustomHeader
-          title={t._('Cash Withdrawal')}
-          onBackPressed={() => this.props.navigation.navigate('OnBoarding')}
+          title={t._('Cash Preview')}
+          onBackPressed={() => this.props.navigation.goBack()}
         />
         <ContainerView>
           <View>
@@ -141,17 +119,13 @@ class CustomerHome extends React.Component<Props> {
           </View>
           <ButtonContainer>
             <Button
-              title={t._('Approve Amount')}
+              title={t._('Accept')}
               onPress={() => this.onProceedPressed()}></Button>
           </ButtonContainer>
         </ContainerView>
-        <NumberPad
-          onPress={numPressed => this.onNumbPressed(numPressed)}
-          onBackSpace={() => this.onBackspacePressed()}
-        />
       </ThemeProvider>
     );
   }
 }
 
-export {CustomerHome};
+export {CustomerPreview};

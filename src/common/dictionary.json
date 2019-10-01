@@ -1,10 +1,13 @@
 {
-  "en": {
-    "For Customers": "For Customers",
-    "For Operators": "For Operators"
-  },
   "hu": {
     "For Customers": "Folytatás, mint Ügyfél",
-    "For Operators": "Folytatás, mint Operátor"
+    "For Operators": "Folytatás, mint Operátor",
+    "Cash Withdrawal": "",
+    "Enter Withdrawal Amount (HUF)": "Írd be a kívánt összeget",
+    "Approve Amount": "Jóváhagyás",
+    "Smallest possible bank note is 2000. Please change to a valid amount!": "A legkisebb bankjegy 2000. Helyes összeget adj meg!",
+    "Maximum withdrawal limit is 999.999": "Készpénzfelvételi limit 999.999",
+    "You cannot start with 0": "0-val nem kezdődhet az összeg",
+    "Cash Preview": "Kiadandó bankjegyek"
   }
 }
