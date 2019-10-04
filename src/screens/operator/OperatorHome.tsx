@@ -6,14 +6,15 @@ import {
   Header,
   Text,
   Button,
+  Icon,
 } from 'react-native-elements';
 import styled from 'styled-components/native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { appTheme } from '../../styles/appTheme';
 import * as colours from '../../styles/colours';
-import { NumberPad } from '../../components/NumberPad';
+import { AtmCard } from '../../components/';
 import t from '../../common/Translator';
+import * as Utils from '../../common/Utils';
 
 const ContainerView = styled.View`
   flex: 2;
@@ -45,7 +46,11 @@ class OperatorHome extends React.Component {
       //@ts-ignore
       <ThemeProvider theme={appTheme}>
         <Header centerComponent={{ text: t._('Home') }} />
-        <Text>OPERATOR HOME</Text>
+        <AtmCard
+          title={`${Utils.numberWithCommas(10000)} Ft`}
+          contentLeft={'12 pc'}
+          contentRight={`${Utils.numberWithCommas(10000 * 12)} Ft`}
+        />
       </ThemeProvider>
     );
   }

@@ -60,21 +60,20 @@ class CustomerHomeComponent extends React.Component<Props> {
 
   /**
    * Numeric button onPress handler.
+   * @param amount User input, amount to withdraw.
    */
   onNumbPressed = (numPressed: string) => {
     let currentAmount = this.state.withdrawalAmount;
+    let message = '';
     if (currentAmount.length < 1 && numPressed == '0') {
-      this.setState({ message: t._('You cannot start with 0') });
-      return;
-    }
-    if (currentAmount.length >= 6) {
-      this.setState({ message: t._('Maximum withdrawal limit is 999.999') });
-      return;
+      message = t._('You cannot start with 0');
+    } else if (currentAmount.length >= 6) {
+      message = t._('Maximum withdrawal limit is 999.999');
     }
 
     let withdrawalAmount = `${this.state.withdrawalAmount}${numPressed}`;
     this.setState({
-      message: '',
+      message,
       withdrawalAmount,
     });
   };
@@ -90,18 +89,19 @@ class CustomerHomeComponent extends React.Component<Props> {
 
   /**
    * Proceed button onPress handler.
+   * Prevalidates amount.
    */
   onProceedPressed = () => {
-    this.props.approveAmount(parseInt(this.state.withdrawalAmount));
-    /*if (!Utils.isValidAmount(parseInt(this.state.withdrawalAmount))) {
+    if (!Utils.isValidAmount(parseInt(this.state.withdrawalAmount))) {
       this.setState({
         message: t._(
-          'Smallest possible bank note is 2000. Please change to a valid amount!',
+          'mallest possible bank note is 2000. Please Schange to a valid amount!',
         ),
       });
     } else {
-      this.props.navigation.navigate('CustomerPreview');
-    }*/
+      //this.props.navigation.navigate('CustomerPreview');
+      this.props.approveAmount(parseInt(this.state.withdrawalAmount));
+    }
   };
 
   /**

@@ -6,6 +6,7 @@ import {
   Header,
   Text,
   Button,
+  Icon,
 } from 'react-native-elements';
 import styled from 'styled-components/native';
 import {
@@ -15,7 +16,7 @@ import {
 } from 'react-navigation';
 import { appTheme } from '../../styles/appTheme';
 import * as colours from '../../styles/colours';
-import { CustomHeader } from '../../components/CustomHeader';
+import { CustomHeader } from '../../components/AtmHeader';
 import t from '../../common/Translator';
 
 /**
@@ -111,25 +112,22 @@ class CustomerPreview extends React.Component<Props> {
     return (
       //@ts-ignore
       <ThemeProvider theme={appTheme}>
-        <CustomHeader
-          title={t._('Cash Preview')}
-          onBackPressed={() => this.props.navigation.goBack()}
-        />
-        <ContainerView>
-          <View>
-            <Card title={t._('Enter Withdrawal Amount (HUF)')}>
-              <CenteredView>
-                {this.renderAmountText(this.state.withdrawalAmount)}
-              </CenteredView>
-            </Card>
-            <Message>{this.state.message}</Message>
-          </View>
-          <ButtonContainer>
-            <Button
-              title={t._('Accept')}
-              onPress={() => this.onProceedPressed()}></Button>
-          </ButtonContainer>
-        </ContainerView>
+        <Card title="HELLO WORLD">
+          <Text style={{ marginBottom: 10 }}>
+            The idea with React Native Elements is more about component
+            structure than actual design.
+          </Text>
+          <Button
+            icon={<Icon name="code" color="#ffffff" />}
+            buttonStyle={{
+              borderRadius: 0,
+              marginLeft: 0,
+              marginRight: 0,
+              marginBottom: 0,
+            }}
+            title="VIEW NOW"
+          />
+        </Card>
       </ThemeProvider>
     );
   }
