@@ -1,4 +1,7 @@
 export const USER_APPROVE_AMOUNT = 'approve_amount';
+export const USER_AMOUNT_VALID = 'amount_valid';
+export const USER_AMOUNT_INVALID = 'amount_invalid';
+
 export const PASSWORD_CHANGED = 'password_changed';
 export const LOGIN_USER_SUCCESS = 'login_user_success';
 export const LOGIN_USER_FAIL = 'login_user_fail';

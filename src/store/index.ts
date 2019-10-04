@@ -3,11 +3,13 @@ export interface Banknote {
   amount: number;
 }
 
+export interface NumberTMap<T> {
+  [key: number]: T;
+}
+export interface NumberNumberMap extends NumberTMap<number> {}
+
 export interface Notes {
-  n2k: Banknote;
-  n5k: Banknote;
-  n10k: Banknote;
-  n20k: Banknote;
+  [key: number]: number;
 }
 
 enum TransactionsStatusCodes {
@@ -38,22 +40,10 @@ export interface BankState {
 
 export const INITIAL_STATE: BankState = {
   notes: {
-    n2k: {
-      value: 2000,
-      amount: 0,
-    },
-    n5k: {
-      value: 5000,
-      amount: 0,
-    },
-    n10k: {
-      value: 10000,
-      amount: 0,
-    },
-    n20k: {
-      value: 20000,
-      amount: 0,
-    },
+    2000: 0,
+    5000: 0,
+    10000: 0,
+    20000: 0,
   },
   history: [],
   currentWithdrawal: null,
