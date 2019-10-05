@@ -16,7 +16,7 @@ import { Provider } from 'react-redux';
 import { OnBoarding } from './src/screens/OnBoarding';
 import { CustomerHome, CustomerPreview } from './src/screens/customer';
 import { OperatorHome, OperatorList } from './src/screens/operator';
-import CreateStore from './src/store/CreateStore';
+import CreateStore from './src/store';
 
 export default class App extends React.Component {
   render() {

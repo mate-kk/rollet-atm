@@ -14,7 +14,7 @@ import * as colours from '../../styles/colours';
 import { NumberPad, CustomHeader } from '../../components';
 import t from '../../common/Translator';
 import * as Utils from '../../common/Utils';
-import { approveAmount } from '../../store/actions';
+//import { approveAmount } from '../../store/actions';
 
 /**
  * Styled Components
@@ -44,7 +44,7 @@ const Message = styled.Text`
  */
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
-  approveAmount: typeof approveAmount;
+  //approveAmount: typeof approveAmount;
 }
 
 /**
@@ -100,7 +100,7 @@ class CustomerHomeComponent extends React.Component<Props> {
       });
     } else {
       //this.props.navigation.navigate('CustomerPreview');
-      this.props.approveAmount(parseInt(this.state.withdrawalAmount));
+      //this.props.approveAmount(parseInt(this.state.withdrawalAmount));
     }
   };
 
@@ -155,7 +155,9 @@ const mapStateToProps = state => {
 
 const CustomerHome = connect(
   mapStateToProps,
-  { approveAmount },
+  {
+    /*approveAmount*/
+  },
 )(CustomerHomeComponent);
 
 export { CustomerHome };

@@ -1,4 +1,4 @@
-import { Notes } from '../store';
+import { Notes } from '../store/notes/Types';
 
 /**
  * Prevalidates give amount. It needs to be higher than 2000, and divisible by 1000.

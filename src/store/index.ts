@@ -1,50 +1,26 @@
-export interface Banknote {
-  value: number;
-  amount: number;
-}
+import { createStore, combineReducers } from 'redux';
+import { persistStore, persistReducer } from 'redux-persist';
+import AsyncStorage from '@react-native-community/async-storage';
 
-export interface NumberTMap<T> {
-  [key: number]: T;
-}
-export interface NumberNumberMap extends NumberTMap<number> {}
+import { NoteReducer } from './notes/Reducers';
+import { TransactionReducer } from './transactions/Reducers';
 
-export interface Notes {
-  [key: number]: number;
-}
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+};
 
-enum TransactionsStatusCodes {
-  SUCCESS = 'SUCCESS',
-  PENDING = 'PENDING',
-  FAILED_NO_MATCHING_NOTES = 'FAILED_NO_MATCHING_NOTES',
-  FAILED_INVALID_AMOUNT = 'FAILED_INVALID_AMOUNT',
-}
+const rootReducer = combineReducers({
+  noteState: NoteReducer,
+  transactionState: TransactionReducer,
+});
 
-export type TransactionStatus =
-  | TransactionsStatusCodes.SUCCESS
-  | TransactionsStatusCodes.PENDING
-  | TransactionsStatusCodes.FAILED_NO_MATCHING_NOTES
-  | TransactionsStatusCodes.FAILED_INVALID_AMOUNT;
+export type AppState = ReturnType<typeof rootReducer>;
 
-export interface Transaction {
-  withdrawalAmount: number;
-  withdrawalNotes: Notes;
-  dateTime: string;
-  status: TransactionStatus;
-}
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export interface BankState {
-  notes: Notes;
-  history: Transaction[];
-  currentWithdrawal: null | Transaction;
-}
-
-export const INITIAL_STATE: BankState = {
-  notes: {
-    2000: 0,
-    5000: 0,
-    10000: 0,
-    20000: 0,
-  },
-  history: [],
-  currentWithdrawal: null,
+export default () => {
+  let store = createStore(persistedReducer);
+  let persistor = persistStore(store);
+  return { store, persistor };
 };
