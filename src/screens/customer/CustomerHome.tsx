@@ -14,7 +14,14 @@ import * as colours from '../../styles/colours';
 import { NumberPad, CustomHeader } from '../../components';
 import t from '../../common/Translator';
 import * as Utils from '../../common/Utils';
-//import { approveAmount } from '../../store/actions';
+import {
+  addTransaction,
+  setTransaction,
+  insufficientAmount,
+} from '../../store/transactions/Actions';
+import { Notes } from '../../store/notes/Types';
+import { AppState } from '../../store';
+import { getNotes } from '../../store/notes/Actions';
 
 /**
  * Styled Components
@@ -44,7 +51,11 @@ const Message = styled.Text`
  */
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
-  //approveAmount: typeof approveAmount;
+  addTransaction: typeof addTransaction;
+  setTransaction: typeof setTransaction;
+  insufficientAmount: typeof insufficientAmount;
+  getNotes: typeof getNotes;
+  notes: Notes;
 }
 
 /**
@@ -65,13 +76,17 @@ class CustomerHomeComponent extends React.Component<Props> {
   onNumbPressed = (numPressed: string) => {
     let currentAmount = this.state.withdrawalAmount;
     let message = '';
+    let withdrawalAmount = `${this.state.withdrawalAmount}`;
     if (currentAmount.length < 1 && numPressed == '0') {
       message = t._('You cannot start with 0');
     } else if (currentAmount.length >= 6) {
-      message = t._('Maximum withdrawal limit is 999.999');
+      message = t._(
+        `Maximum withdrawal limit is ${Utils.numberWithSeparator(999999)} Ft`,
+      );
+    } else {
+      withdrawalAmount = `${this.state.withdrawalAmount}${numPressed}`;
     }
 
-    let withdrawalAmount = `${this.state.withdrawalAmount}${numPressed}`;
     this.setState({
       message,
       withdrawalAmount,
@@ -84,7 +99,7 @@ class CustomerHomeComponent extends React.Component<Props> {
   onBackspacePressed = () => {
     let value = this.state.withdrawalAmount;
     let withdrawalAmount = value.slice(0, value.length - 1);
-    this.setState({ withdrawalAmount });
+    this.setState({ withdrawalAmount, message: '' });
   };
 
   /**
@@ -92,15 +107,17 @@ class CustomerHomeComponent extends React.Component<Props> {
    * Prevalidates amount.
    */
   onProceedPressed = () => {
-    if (!Utils.isValidAmount(parseInt(this.state.withdrawalAmount))) {
-      this.setState({
-        message: t._(
-          'mallest possible bank note is 2000. Please Schange to a valid amount!',
-        ),
+    let value = parseInt(this.state.withdrawalAmount) || 0;
+    let notes = Utils.getBankNotes(value, this.props.notes);
+    if (!notes) {
+      this.props.insufficientAmount(value, this.props.notes);
+      this.props.navigation.navigate('CustomerStatus', {
+        title: 'Insufficient Amount',
+        message: 'Please adjust the withdrawal amount!',
       });
     } else {
-      //this.props.navigation.navigate('CustomerPreview');
-      //this.props.approveAmount(parseInt(this.state.withdrawalAmount));
+      this.props.setTransaction(value, notes);
+      this.props.navigation.navigate('CustomerPreview');
     }
   };
 
@@ -109,10 +126,11 @@ class CustomerHomeComponent extends React.Component<Props> {
    * @param amount User input, amount to withdraw.
    */
   renderAmountText = (amount: string) => {
+    let text = amount === '' ? '' : Utils.numberWithSeparator(parseInt(amount));
     return (
       <Text
         style={{ fontSize: 40, fontWeight: 'bold', color: colours.PRIMARY }}>
-        {amount}
+        {text}
       </Text>
     );
   };
@@ -149,14 +167,20 @@ class CustomerHomeComponent extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = state => {
-  return state;
+const mapStateToProps = (state: AppState) => {
+  return {
+    notes: state.noteState.notes,
+    transactionState: state.transactionState.transactions,
+  };
 };
 
 const CustomerHome = connect(
   mapStateToProps,
   {
-    /*approveAmount*/
+    addTransaction,
+    getNotes,
+    setTransaction,
+    insufficientAmount,
   },
 )(CustomerHomeComponent);
 

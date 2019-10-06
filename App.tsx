@@ -14,8 +14,16 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
 
 import { OnBoarding } from './src/screens/OnBoarding';
-import { CustomerHome, CustomerPreview } from './src/screens/customer';
-import { OperatorHome, OperatorList } from './src/screens/operator';
+import {
+  CustomerHome,
+  CustomerPreview,
+  CustomerStatus,
+} from './src/screens/customer';
+import {
+  OperatorHome,
+  OperatorHistory,
+  OperatorHistoryDetails,
+} from './src/screens/operator';
 import CreateStore from './src/store';
 
 export default class App extends React.Component {
@@ -34,13 +42,16 @@ export default class App extends React.Component {
 
 const OperatorTab = createBottomTabNavigator({
   OperatorHome,
-  OperatorList,
+  OperatorHistory,
 });
 
 const CustomerStack = createStackNavigator(
   {
     CustomerHome,
     CustomerPreview,
+    CustomerStatus: {
+      screen: CustomerStatus,
+    },
   },
   {
     headerMode: 'none',
@@ -52,6 +63,9 @@ const RootStack = createStackNavigator(
     OnBoarding: OnBoarding,
     CustomerRoute: CustomerStack,
     OperatorRoute: OperatorTab,
+    OperatorHistoryDetails: {
+      screen: OperatorHistoryDetails,
+    },
   },
   {
     headerMode: 'none',

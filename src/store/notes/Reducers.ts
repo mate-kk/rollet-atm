@@ -3,21 +3,19 @@ import {
   INCREASE_NOTE,
   DECREASE_NOTE,
   NoteActioTypes,
+  SET_NEW_NOTES,
 } from './Types';
 
 const initialState: NoteState = {
   notes: {
-    2000: 0,
-    5000: 0,
-    10000: 0,
-    20000: 0,
+    2000: 10,
+    5000: 10,
+    10000: 10,
+    20000: 10,
   },
 };
 
-export function NoteReducer(
-  state = initialState,
-  action: NoteActioTypes,
-): NoteState {
+export default (state = initialState, action: NoteActioTypes): NoteState => {
   switch (action.type) {
     case INCREASE_NOTE:
       return {
@@ -28,6 +26,8 @@ export function NoteReducer(
         },
       };
     case DECREASE_NOTE:
+      // Do not go below 0
+      if (state.notes[action.payload.note] == 0) return state;
       return {
         notes: {
           ...state.notes,
@@ -35,7 +35,11 @@ export function NoteReducer(
             state.notes[action.payload.note] - action.payload.amount,
         },
       };
+    case SET_NEW_NOTES:
+      return {
+        notes: { ...action.payload.notes },
+      };
     default:
       return state;
   }
-}
+};

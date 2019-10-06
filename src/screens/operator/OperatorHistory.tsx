@@ -1,31 +1,23 @@
 import React from 'react';
 import { FlatList } from 'react-native';
 import { connect, ThunkDispatch } from 'react-redux';
-import { ThemeProvider, Header, Card, Text } from 'react-native-elements';
-import styled from 'styled-components/native';
+import { ThemeProvider, Header } from 'react-native-elements';
 import {
   NavigationParams,
   NavigationScreenProp,
   NavigationState,
 } from 'react-navigation';
-
 import { appTheme } from '../../styles/appTheme';
-import { AtmCard, CustomHeader } from '../../components/';
+import { HistoryCard, CustomHeader } from '../../components';
 import t from '../../common/Translator';
 import * as Utils from '../../common/Utils';
 import {
   increaseNoteAmount,
   decreaseNoteAmount,
 } from '../../store/notes/Actions';
-import { NoteState, ValidNote, NoteActioTypes } from '../../store/notes/Types';
+import { ValidNote } from '../../store/notes/Types';
+import { TransactionState, Transaction } from '../../store/transactions/Types';
 import { AppState } from '../../store';
-
-/**
- * Styled Components
- */
-const CenteredView = styled.View`
-  align-items: center;
-`;
 
 /**
  * Interfaces
@@ -34,38 +26,27 @@ interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
   increaseNoteAmount: typeof increaseNoteAmount;
   decreaseNoteAmount: typeof decreaseNoteAmount;
-  notes: NoteState;
+  transactions: TransactionState;
 }
 
 /**
  * Main tab screen of Operators use-case.
  * Operator may check and edit the notes in the atm.
  */
-class OperatorHomeComponent extends React.Component<Props> {
+class OperatorHistoryComponent extends React.Component<Props> {
   renderItem = (key: string) => {
-    let bankNote = parseInt(key) as ValidNote;
-    let piece = this.props.notes[key];
+    let currentTransaction: Transaction = this.props.transactions[key];
     return (
-      <AtmCard
-        title={`${Utils.numberWithSeparator(bankNote)} Ft`}
-        controls={true}
-        contentLeft={`${piece} pc`}
-        contentRight={`${Utils.numberWithSeparator(bankNote * piece)} Ft`}
-        onDecPressed={() => this.props.decreaseNoteAmount(bankNote)}
-        onIncPressed={() => this.props.increaseNoteAmount(bankNote)}
+      <HistoryCard
+        status={currentTransaction.status}
+        amount={`${Utils.numberWithSeparator(currentTransaction.amount)} Ft`}
+        timeStamp={currentTransaction.dateTime}
+        onPress={() =>
+          this.props.navigation.navigate('OperatorHistoryDetails', {
+            transaction: currentTransaction,
+          })
+        }
       />
-    );
-  };
-
-  renderSum = () => {
-    return (
-      <Card
-        title={t._('TOTAL AMOUNT (HUF)')}
-        containerStyle={{ marginBottom: 10 }}>
-        <CenteredView>
-          <Text>{Utils.calculateTotalAmount(this.props.notes)}</Text>
-        </CenteredView>
-      </Card>
     );
   };
 
@@ -74,12 +55,11 @@ class OperatorHomeComponent extends React.Component<Props> {
       //@ts-ignore
       <ThemeProvider theme={appTheme}>
         <CustomHeader
-          title={t._('ATM Balance')}
+          title={t._('Transaction history')}
           onBackPressed={() => this.props.navigation.navigate('OnBoarding')}
         />
-        {this.renderSum()}
         <FlatList
-          data={Object.keys(this.props.notes)}
+          data={Object.keys(this.props.transactions)}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => this.renderItem(item)}
           keyExtractor={(item: any, index: any) => `${item.amount}${index}`}
@@ -92,7 +72,7 @@ class OperatorHomeComponent extends React.Component<Props> {
 const mapStateToProps = (state: AppState) => {
   return {
     notes: state.noteState.notes,
-    transactionState: state.transactionState.transactions,
+    transactions: state.transactionState.transactions,
   };
 };
 
@@ -103,9 +83,9 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, any>) => {
   };
 };
 
-const OperatorHome = connect(
+const OperatorHistory = connect(
   mapStateToProps,
   mapDispatchToProps,
-)(OperatorHomeComponent);
+)(OperatorHistoryComponent);
 
-export { OperatorHome };
+export { OperatorHistory };

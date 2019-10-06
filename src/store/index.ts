@@ -2,7 +2,7 @@ import { createStore, combineReducers } from 'redux';
 import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import { NoteReducer } from './notes/Reducers';
+import NoteReducer from './notes/Reducers';
 import { TransactionReducer } from './transactions/Reducers';
 
 const persistConfig = {

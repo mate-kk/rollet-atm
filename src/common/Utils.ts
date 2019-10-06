@@ -1,4 +1,5 @@
-import { Notes } from '../store/notes/Types';
+import { Notes, ValidNote, NoteState } from '../store/notes/Types';
+import { useDebugValue } from 'react';
 
 /**
  * Prevalidates give amount. It needs to be higher than 2000, and divisible by 1000.
@@ -17,38 +18,65 @@ export const isValidAmount = (amount: number): boolean => {
  * @param sep Separator to use between thousands
  * @returns Formatted number as string.
  */
-export const numberWithCommas = (n: number, sep: string = ' '): string => {
+export const numberWithSeparator = (n: number, sep: string = ' '): string => {
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, sep);
 };
 
-export const getBankNotes = (amount: number, availableNotes: any): any => {
-  return getMoney(1000, limits);
+/**
+ * Calculates total amount of given notes.
+ * @param notes Banknotes to summarize.
+ * @returns Total value of bank notes.
+ */
+export const calculateTotalAmount = (notes: object): number => {
+  return Object.entries(notes).reduce(function(total, pair) {
+    const [key, value] = pair;
+    return total + parseInt(key) * value;
+  }, 0);
 };
 
-let getMoney = (amount, limits) => {
-  let recur = (amount, nominals) => {
-    if (amount == 0) return {}; // success
-    if (!nominals.length) return; // failure
-    let nominal = nominals[0];
-    let count = Math.min(limits[nominal], Math.floor(amount / nominal));
+export const subtractNotes = (atmBalance: Notes, toSubtract: Notes): Notes => {
+  let ret: Notes = { ...atmBalance };
+  Object.keys(toSubtract).forEach((value, index) => {
+    ret[value] =
+      ret[value] - toSubtract[value] < 0 ? 0 : ret[value] - toSubtract[value];
+  });
+  return ret;
+};
+
+export const timeStamp2ReadableFormat = (timeStamp: number): string => {
+  return `${new Date(timeStamp).toLocaleDateString()}  -  ${new Date(
+    timeStamp,
+  ).toLocaleTimeString()}`;
+};
+
+export const getBankNotes = (
+  amount: number,
+  availableNotes: Notes,
+): Notes | undefined => {
+  if (amount == 0) return undefined;
+  let getRecursively = (amount: number, notesLeft) => {
+    if (amount == 0) return {};
+    let current = notesLeft[0];
+    let count = Math.min(availableNotes[current], Math.floor(amount / current));
     for (let i = count; i >= 0; i--) {
-      let result = recur(amount - i * nominal, nominals.slice(1));
-      if (result) return i ? { [nominal]: i, ...result } : result;
+      let result = getRecursively(amount - i * current, notesLeft.slice(1));
+      if (result) return i ? { [current]: i, ...result } : result;
     }
   };
-  return recur(
+  return getRecursively(
     amount,
-    Object.keys(limits)
+    Object.keys(availableNotes)
       .map(Number)
       .sort((a, b) => b - a),
   );
 };
 
 // count of nominals in ATM
-let limits = { 1000: 5, 500: 2, 100: 5, 50: 100, 30: 6 };
-
-console.log(getMoney(1000, limits)); // {1000: 1}
-console.log(getMoney(230, limits)); // {30: 1, 100: 2}
-console.log(getMoney(200, limits)); // {100: 2}
-console.log(getMoney(150, limits)); // {50: 1, 100: 1}
-console.log(getMoney(120, limits)); // {30: 4}
+let notes1: Notes = { 2000: 5, 5000: 2, 10000: 2, 20000: 200 };
+//subtractNotes(notes1, { 2000: 1, 5000: 8, 10000: 2 });
+console.log(getBankNotes(1000, notes1)); // {1000: 1}
+console.log(getBankNotes(230, notes1)); // {30: 1, 100: 2}
+console.log(getBankNotes(200, notes1)); // {100: 2}
+console.log(getBankNotes(150, notes1)); // {50: 1, 100: 1}
+console.log(getBankNotes(120, notes1)); // {30: 4}
+console.log(getBankNotes(150000, notes1)); // {30: 4}

@@ -1,45 +1,34 @@
 import React from 'react';
-import { View } from 'react-native';
-import {
-  Card,
-  ThemeProvider,
-  Header,
-  Text,
-  Button,
-  Icon,
-} from 'react-native-elements';
+import { FlatList } from 'react-native';
+import { connect, ThunkDispatch } from 'react-redux';
+import { Card, ThemeProvider, Text, Button } from 'react-native-elements';
 import styled from 'styled-components/native';
 import {
   NavigationParams,
   NavigationScreenProp,
   NavigationState,
 } from 'react-navigation';
+
 import { appTheme } from '../../styles/appTheme';
-import * as colours from '../../styles/colours';
 import { CustomHeader } from '../../components/AtmHeader';
 import t from '../../common/Translator';
+import { AppState } from '../../store';
+import { ValidNote, Notes } from '../../store/notes/Types';
+import * as Utils from '../../common/Utils';
+import { AtmCard } from '../../components';
+import { Transaction } from '../../store/transactions/Types';
+import { addTransaction } from '../../store/transactions/Actions';
+import { setNewNotes } from '../../store/notes/Actions';
 
 /**
  * Styled Components
  */
-const ContainerView = styled.View`
-  flex: 2;
-  justify-content: space-between;
-`;
-
 const CenteredView = styled.View`
   align-items: center;
 `;
 
 const ButtonContainer = styled.View`
-  padding: 15px;
-`;
-
-const Message = styled.Text`
-  margin: 10px;
-  margin-left: 15px;
-  font-size: 15;
-  color: red;
+  padding-top: 15px;
 `;
 
 /**
@@ -47,6 +36,10 @@ const Message = styled.Text`
  */
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
+  transaction: Transaction;
+  notes: Notes;
+  addTransaction: typeof addTransaction;
+  setNewNotes: typeof setNewNotes;
 }
 
 /**
@@ -54,57 +47,47 @@ interface Props {
  * User may enter the amount to withdraw.
  * Basic validations are performed,
  */
-class CustomerPreview extends React.Component<Props> {
-  state = {
-    withdrawalAmount: '',
-    message: '',
-  };
-
-  /**
-   * Backspace button onPress handler.
-   */
-  onBackspacePressed = () => {
-    let value = this.state.withdrawalAmount;
-    let withdrawalAmount = value.slice(0, value.length - 1);
-    this.setState({ withdrawalAmount });
-  };
-
+class CustomerPreviewComponent extends React.Component<Props> {
   /**
    * Proceed button onPress handler.
    */
   onProceedPressed = () => {
-    if (!this.isValidAmount(parseInt(this.state.withdrawalAmount))) {
-      this.setState({
-        message: t._(
-          'Smallest possible bank note is 2000. Please change to a valid amount!',
-        ),
-      });
-    } else {
-      this.props.navigation.navigate('CustomerPreview');
-    }
+    let { amount, notes } = this.props.transaction;
+    let remainingNotes = Utils.subtractNotes(this.props.notes, notes);
+    this.props.addTransaction(amount, notes, remainingNotes);
+    this.props.setNewNotes(remainingNotes);
+    this.props.navigation.navigate('CustomerStatus', {
+      message: 'Transaction Accepted',
+      goto: 'OnBoarding',
+    });
   };
 
-  /**
-   * Prevalidates give amount. It needs to be higher than 2000, and divisible by 1000.
-   * @param amount User input, amount to withdraw.
-   * @returns True if valid, false otherwise.
-   */
-  isValidAmount = (amount: number): boolean => {
-    if (amount < 2000) return false;
-    if (amount % 1000 != 0 && amount % 1000 < 1000) return false;
-    return true;
-  };
-
-  /**
-   * Renders given text (amount)
-   * @param amount User input, amount to withdraw.
-   */
-  renderAmountText = (amount: string) => {
+  renderItem = (key: string) => {
+    let bankNote = parseInt(key) as ValidNote;
+    let piece = this.props.transaction.notes[key];
     return (
-      <Text
-        style={{ fontSize: 40, fontWeight: 'bold', color: colours.PRIMARY }}>
-        {amount}
-      </Text>
+      <AtmCard
+        title={`${Utils.numberWithSeparator(bankNote)} Ft`}
+        contentLeft={`${piece} pc`}
+        contentRight={`${Utils.numberWithSeparator(bankNote * piece)} Ft`}
+      />
+    );
+  };
+
+  renderSum = () => {
+    return (
+      <Card
+        title={t._('TOTAL AMOUNT (HUF)')}
+        containerStyle={{ marginBottom: 10 }}>
+        <CenteredView>
+          <Text>{this.props.transaction.amount}</Text>
+        </CenteredView>
+        <ButtonContainer>
+          <Button
+            title={t._('Accept and Withdraw')}
+            onPress={() => this.onProceedPressed()}></Button>
+        </ButtonContainer>
+      </Card>
     );
   };
 
@@ -112,25 +95,40 @@ class CustomerPreview extends React.Component<Props> {
     return (
       //@ts-ignore
       <ThemeProvider theme={appTheme}>
-        <Card title="HELLO WORLD">
-          <Text style={{ marginBottom: 10 }}>
-            The idea with React Native Elements is more about component
-            structure than actual design.
-          </Text>
-          <Button
-            icon={<Icon name="code" color="#ffffff" />}
-            buttonStyle={{
-              borderRadius: 0,
-              marginLeft: 0,
-              marginRight: 0,
-              marginBottom: 0,
-            }}
-            title="VIEW NOW"
-          />
-        </Card>
+        <CustomHeader
+          title={t._('Bank notes')}
+          onBackPressed={() => this.props.navigation.goBack()}
+        />
+        {this.renderSum()}
+        <FlatList
+          data={Object.keys(this.props.transaction.notes)}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => this.renderItem(item)}
+          keyExtractor={(item: any, index: any) => `${item.amount}${index}`}
+        />
       </ThemeProvider>
     );
   }
 }
+
+const mapStateToProps = (state: AppState) => {
+  return {
+    transaction: state.transactionState.currentTransaction,
+    notes: state.noteState.notes,
+  };
+};
+
+const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, any>) => {
+  return {
+    addTransaction: (amount: number, notes: Notes, remainingNotes: Notes) =>
+      dispatch(addTransaction(amount, notes, remainingNotes)),
+    setNewNotes: (notes: Notes) => dispatch(setNewNotes(notes)),
+  };
+};
+
+const CustomerPreview = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(CustomerPreviewComponent);
 
 export { CustomerPreview };

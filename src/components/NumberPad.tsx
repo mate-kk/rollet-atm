@@ -1,6 +1,4 @@
 import React from 'react';
-import {View} from 'react-native';
-import {Text} from 'react-native-elements';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -91,4 +89,4 @@ const NumberPad = (props: NumberPadProps) => {
   );
 };
 
-export {NumberPad};
+export { NumberPad };

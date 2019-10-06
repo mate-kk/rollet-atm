@@ -1,2 +1,3 @@
 export * from './OperatorHome';
-export * from './OperatorList';
+export * from './OperatorHistory';
+export * from './OperatoryHistoryDetails';

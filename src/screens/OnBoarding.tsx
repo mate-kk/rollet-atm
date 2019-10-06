@@ -1,15 +1,14 @@
 import React from 'react';
-import {Divider, ThemeProvider} from 'react-native-elements';
+import { Divider, ThemeProvider } from 'react-native-elements';
 import {
   NavigationParams,
   NavigationScreenProp,
   NavigationState,
-  NavigationInjectedProps,
 } from 'react-navigation';
 
-import {ContainerView} from '../components/ContainerView';
-import {OnBoardingButton} from '../components/OnBoardingButton';
-import {appTheme} from '../styles/appTheme';
+import { ContainerView } from '../components/ContainerView';
+import { OnBoardingButton } from '../components/OnBoardingButton';
+import { appTheme } from '../styles/appTheme';
 import t from '../common/Translator';
 
 interface Props {
@@ -26,7 +25,7 @@ class OnBoarding extends React.Component<Props> {
             title={t._('For Customers')}
             onPress={() => this.props.navigation.navigate('CustomerRoute')}
           />
-          <Divider style={{backgroundColor: 'blue'}} />
+          <Divider style={{ backgroundColor: 'blue' }} />
           <OnBoardingButton
             title={t._('For Operators')}
             onPress={() => this.props.navigation.navigate('OperatorRoute')}
@@ -37,4 +36,4 @@ class OnBoarding extends React.Component<Props> {
   }
 }
 
-export {OnBoarding};
+export { OnBoarding };
