@@ -1,5 +1,5 @@
 # The ATM problem
-note dispenser logic of an ATM.
+Banknote dispenser logic of an ATM.
 
 # User stories
 - As a user I want to be able to enter the amount I want to withdraw from the ATM (I
